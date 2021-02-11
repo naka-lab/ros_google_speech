@@ -24,6 +24,7 @@ def main():
     server.set_fn_client_left(client_left)
     server.set_fn_message_received(message_received) 
 
+    print("GoogleChromeで https://hp.naka-lab.org/ros_google_speech/ を開いて、音声認識・合成開始ボタンを押す")
 
     server.run_forever()
 
