@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+ 
+<head>
+    <meta charset="UTF-8">
+    <title>Web Speech API</title>
+    <script>
+        var flag_speech = 0;
+ 
+        var wSck= new WebSocket("ws://localhost:60000/");
+
+        // WebSocket関連の関数
+        wSck.onopen = function() {
+            document.getElementById('status_connection').innerHTML += "接続完了";
+        };
+
+        wSck.onmessage = function(e) {
+            document.getElementById('utterance').value = e.data;
+            say()
+        };
+
+        // 音声認識関数
+        var send_msg = function(val) {
+            var line = document.getElementById('msg');
+            wSck.send(line.value);
+        };
+
+        function start_sr() {
+            window.SpeechRecognition = window.SpeechRecognition || webkitSpeechRecognition;
+            var recognition = new webkitSpeechRecognition();
+            recognition.lang = 'ja';
+            recognition.interimResults = true;
+            recognition.continuous = true;
+ 
+            recognition.onsoundstart = function() {
+                document.getElementById('status_sr').innerHTML = "認識中";
+            };
+            recognition.onnomatch = function() {
+                document.getElementById('status_sr').innerHTML = "認識失敗";
+            };
+            recognition.onerror = function() {
+                document.getElementById('status_sr').innerHTML = "エラー";
+                if(flag_speech == 0)
+                start_sr();
+            };
+            recognition.onsoundend = function() {
+                document.getElementById('status_sr').innerHTML = "停止中";
+                start_sr();
+            };
+ 
+            recognition.onresult = function(event) {
+                var results = event.results;
+                for (var i = event.resultIndex; i < results.length; i++) {
+                    if (results[i].isFinal)
+                    {
+                        document.getElementById('result_text').innerHTML = results[i][0].transcript;
+                        wSck.send(results[i][0].transcript);
+                        start_sr();
+                    }
+                    else
+                    {
+                        document.getElementById('result_text').innerHTML = "[認識中...] " + results[i][0].transcript;
+                        flag_speech = 1;
+                    }
+                }
+            }
+            flag_speech = 0;
+            document.getElementById('status_sr').innerHTML = "start";
+            recognition.start();
+        }
+
+        // 発話関数
+        function say() {
+            var line = document.getElementById('utterance');
+            const uttr = new SpeechSynthesisUtterance(line.value)
+
+            uttr.lang = "ja-JP"
+            uttr.rate = 1.0
+            uttr.pitch = 1.5
+            uttr.volume = 1.0
+
+            speechSynthesis.speak(uttr)
+        }
+
+        function start_all(){
+            // 一度ボタンから発話させないと動作しないため，発話させる
+            document.getElementById('utterance').value = "音声認識を開始しました";
+            say()
+
+            start_sr()
+        }
+    </script> 
+</head>
+ 
+<body>
+    <input type="button" onClick="start_all();" value="音認認識・合成開始">
+    <br>
+    <br>
+    認識結果：<br>
+    <textarea id="result_text" cols="50" rows="5"></textarea>
+    <br>
+    認識状態：<br>
+    <textarea id="status_sr" cols="50" rows="1"></textarea>
+    <br>
+    接続状態：<br>
+    <textarea id="status_connection" cols="50" rows="1"></textarea>
+    <br>
+    <br>
+    送信テスト：<br>
+    <textarea id="msg" cols="50" rows="1"></textarea>
+    <input type="button" onClick="send_msg();" value="送信">
+    <br>
+    <br>
+    発話：<br>
+    <textarea id="utterance" cols="50" rows="1"></textarea>
+    <input type="button" onClick="say();" value="発話">
+
+</body>
+ 
+</html>
