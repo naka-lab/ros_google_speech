@@ -2,12 +2,25 @@
 from websocket_server import WebsocketServer
 import rospy
 from std_msgs.msg import String
+import yaml
 
 def message_received(client, server, message):
     # 日本語の文字コードがおかしいので修正
     message = bytes(message, "iso-8859-1").decode("utf8")
-    print( "認識結果：", message )
-    pub_recres.publish( message )
+
+    print("認識結果：")
+    results = []
+    for r in message.split("\n"):
+        print(r)
+        r = r.split(":")
+        if len(r)!=2:
+            continue
+        text, conf = r 
+        results.append( {"text":text, "conf":float(conf)} )
+    print("-------")
+
+    pub_recres.publish( results[0]["text"] )
+    pub_recres_nbest.publish( yaml.dump(results) )
 
 def new_client(client, server):
     print("クライアント接続")
@@ -32,6 +45,7 @@ if __name__=="__main__":
     rospy.init_node('google_speech' )
     rospy.Subscriber("google_speech/utterance", String, say )
     pub_recres = rospy.Publisher('google_speech/recres', String, queue_size=10)
+    pub_recres_nbest = rospy.Publisher('google_speech/recres_nbest', String, queue_size=10)
 
     server = WebsocketServer(60000, host="127.0.0.1")
 

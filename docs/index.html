@@ -31,6 +31,7 @@
             recognition.lang = 'ja';
             recognition.interimResults = true;
             recognition.continuous = true;
+            recognition.maxAlternatives=10;
  
             recognition.onsoundstart = function() {
                 document.getElementById('status_sr').innerHTML = "認識中";
@@ -53,8 +54,14 @@
                 for (var i = event.resultIndex; i < results.length; i++) {
                     if (results[i].isFinal)
                     {
-                        document.getElementById('result_text').innerHTML = results[i][0].transcript;
-                        wSck.send(results[i][0].transcript);
+                        let txt = ""
+                        for(let j=0; j<results[i].length ; j++){
+                            txt += results[i][j].transcript + ":" + results[i][j].confidence + "\n"
+                        }
+                        document.getElementById('result_text').innerHTML = txt
+
+                        //document.getElementById('result_text').innerHTML = results[i][0].transcript + ":" + results[i][0].confidence;
+                        wSck.send(txt);
                         start_sr();
                     }
                     else
@@ -76,7 +83,7 @@
 
             uttr.lang = "ja-JP"
             uttr.rate = 1.0
-            uttr.pitch = 1.5
+            uttr.pitch = 1.0
             uttr.volume = 1.0
 
             speechSynthesis.speak(uttr)
