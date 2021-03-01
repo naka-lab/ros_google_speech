@@ -8,6 +8,7 @@ pip install websocket-server
 cd ~/catkin_ws/src
 git clone https://github.com/naka-lab/ros_google_speech.git
 ```
+[Google Chrome](https://www.google.co.jp/chrome/)がインストールされていなければインストールする
 
 ## 音声認識・合成
 ### 実行
