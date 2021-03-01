@@ -1,0 +1,7 @@
+<launch>
+  <node pkg="ros_google_speech" type="google_speech.py" name="google_speech" cwd="node" output="screen">
+  </node>
+
+  <node pkg="ros_google_speech" type="grammar_lang_understanding.py" name="grammar_lang_understanding" cwd="node" output="screen">
+  </node>
+</launch>
