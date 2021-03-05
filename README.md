@@ -26,9 +26,8 @@ git clone https://github.com/naka-lab/ros_google_speech.git
 
 ## 文法ベースの言語理解
 ### 実行
-1. 音声認識・合成ノードを実行
-2. 言語理解ノードを実行：`rosrun ros_google_speech grammar_lang_understanding.py`
-3. 認識文法を送信（[sample](scripts/example_grammar.py)参照）
+1. 音声認識・合成ノードと言語理解ノードを実行：`roslaunch ros_google_speech google_speech.launch`
+2. 認識文法を送信（[sample](scripts/example_grammar.py)参照）
 
 ### Topic
 - Subscribe
