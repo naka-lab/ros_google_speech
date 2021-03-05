@@ -3,6 +3,7 @@ from websocket_server import WebsocketServer
 import rospy
 from std_msgs.msg import String
 import yaml
+import threading
 
 def message_received(client, server, message):
     # 日本語の文字コードがおかしいので修正
@@ -31,8 +32,6 @@ def client_left(client, server):
 def say( data ):
     print("発話：", data.data )
     server.send_message_to_all( data.data )
-
-import threading
 
 def server_stop_thread():
 
