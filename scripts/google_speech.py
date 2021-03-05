@@ -32,12 +32,33 @@ def say( data ):
     print("発話：", data.data )
     server.send_message_to_all( data.data )
 
+import threading
+
+def server_stop_thread():
+
+    while 1:
+        c = input()
+
+        if c=="q":
+            print("サーバーを終了します")
+            server.shutdown()
+            break
+
 def main():
     server.set_fn_new_client(new_client)
     server.set_fn_client_left(client_left)
     server.set_fn_message_received(message_received) 
 
-    print("GoogleChromeで https://hp.naka-lab.org/ros_google_speech/ を開いて、音声認識・合成開始ボタンを押す")
+    print("*********************************")
+    print("GoogleChromeで ")
+    print("   https://hp.naka-lab.org/ros_google_speech/")
+    print("を開いて、音声認識・合成開始ボタンを押す．")
+    print("q+[ENTER]で終了．")
+    print("*********************************")
+    
+    t = threading.Thread(target=server_stop_thread)
+    t.setDaemon(True)
+    t.start()
 
     server.run_forever()
 
