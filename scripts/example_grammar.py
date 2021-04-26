@@ -32,6 +32,7 @@ person3 : 太郎
 def main():
     rospy.init_node('gspeech_example2')
     pub_grammar = rospy.Publisher( "grammar_lu/grammar", String, queue_size=10 )
+    pub_synthesis = rospy.Publisher( "google_speech/utterance", String, queue_size=10 )	
 
     time.sleep(2)
     pub_grammar.publish( grammar )
@@ -44,6 +45,16 @@ def main():
         print( results["gram_id"] )
         print( results["slot_id"] )
         print("--------")
+
+        if results["gram_id"]=="greeding":
+            if results["slot_id"][0]=="hello":
+                pub_synthesis.publish("ごきげんよう")
+            elif results["slot_id"][0]=="bye":
+                pub_synthesis.publish("さようなら")
+            elif results["slot_id"][0]=="morning":
+                pub_synthesis.publish("早起きは苦手です")
+
+
 
 if __name__ == '__main__':
     main()
