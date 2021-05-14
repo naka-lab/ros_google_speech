@@ -31,7 +31,7 @@ person3 : 太郎
 
 def main():
     rospy.init_node('gspeech_example2')
-    pub_grammar = rospy.Publisher( "grammar_lu/grammar", String, queue_size=10 )
+    pub_grammar = rospy.Publisher( "grammar_lu/grammar", String, queue_size=10, latch=True )
     pub_synthesis = rospy.Publisher( "google_speech/utterance", String, queue_size=10 )	
 
     time.sleep(2)
