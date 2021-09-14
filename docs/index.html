@@ -5,19 +5,35 @@
     <meta charset="UTF-8">
     <title>Web Speech API</title>
     <script>
+        const sleep = waitTime => new Promise( resolve => setTimeout(resolve, waitTime) ); // sleep関数
         var flag_speech = 0;
- 
-        var wSck= new WebSocket("ws://localhost:60000/");
+        var wSck= null;
+        var is_connected = false
+        connect_websock()
 
-        // WebSocket関連の関数
-        wSck.onopen = function() {
-            document.getElementById('status_connection').innerHTML += "接続完了";
-        };
+        // websocketへの接続
+        function connect_websock() {
+            wSck= new WebSocket("ws://localhost:60000/");
 
-        wSck.onmessage = function(e) {
-            document.getElementById('utterance').value = e.data;
-            say()
-        };
+            // WebSocket関連の関数
+            wSck.onopen = function() {
+                document.getElementById('status_connection').innerHTML += "接続完了";
+                is_connected = true
+            };
+
+            wSck.onclose = function() {
+                document.getElementById('status_connection').innerHTML = "接続切断．．．";
+                is_connected = false
+                sleep( 1000 )
+                document.getElementById('status_connection').innerHTML += "再接続試行中．．．"
+                connect_websock() // 接続を再試行
+            };
+
+            wSck.onmessage = function(e) {
+                document.getElementById('utterance').value = e.data;
+                say()
+            };
+        }
 
         // 音声認識関数
         var send_msg = function(val) {
@@ -32,7 +48,7 @@
             recognition.interimResults = true;
             recognition.continuous = true;
             recognition.maxAlternatives=10;
- 
+
             recognition.onsoundstart = function() {
                 document.getElementById('status_sr').innerHTML = "認識中";
             };
