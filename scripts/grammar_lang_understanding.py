@@ -29,26 +29,23 @@ class GrammarBasedLU():
     def recog_callback(self, msg ):
         results = yaml.safe_load(msg.data)
 
-        for r in results:
-            text = r["text"]
+        sentences = [ r["text"] for r in results ]
 
-            m = self.gram.match( text )
-            print(text)
-            if m:
-                gram_id, slot_str, slot_id = m
-                lu_res = {}
-                lu_res["text"] = text 
-                lu_res["gram_id"] = gram_id
-                lu_res["slot_str"] = to_slist(slot_str)
-                lu_res["slot_id"] = to_slist(slot_id)
-                print("文法マッチ", gram_id, slot_str, slot_id)
-                print(yaml.dump(lu_res))
-                self.pub_results.publish( yaml.dump(lu_res) )
-                print( "---------------------------" )
-                return
-            else:
-                print( "文法マッチなし" )
-        print( "---------------------------" )
+        m = self.gram.match( sentences )
+        if m:
+            text, gram_id, slot_str, slot_id = m
+            lu_res = {}
+            lu_res["text"] = text 
+            lu_res["gram_id"] = gram_id
+            lu_res["slot_str"] = to_slist(slot_str)
+            lu_res["slot_id"] = to_slist(slot_id)
+            print("文法マッチ", gram_id, slot_str, slot_id)
+            print(yaml.dump(lu_res))
+            self.pub_results.publish( yaml.dump(lu_res) )
+            print( "---------------------------" )
+            return
+        else:
+            print( "文法マッチなし" )
 
     def set_gram( self, data ):
         print( "--- set grammar ---" )

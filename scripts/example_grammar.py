@@ -8,7 +8,9 @@ import time
 grammar = """
 [GRAMMAR]
 greeding : $slot_greeding
-bring : $slot_drink * $slot_person * <持って行って|届けて|取って>
+bring_known_obj : $slot_drink * $slot_person * <持って行って|届けて|取って>
+bring_unknown_obj : $slot_any を $slot_person * <持って行って|届けて|取って>
+
 
 
 [SLOT]
@@ -44,6 +46,7 @@ def main():
         print( results["text"] )
         print( results["gram_id"] )
         print( results["slot_id"] )
+        print( results["slot_str"] )
         print("--------")
 
         if results["gram_id"]=="greeding":

@@ -1,6 +1,7 @@
 [GRAMMAR]
 greeding : $slot_greeding
-bring : $slot_drink * $slot_person * <持って行って|届けて>
+bring_known_obj : $slot_drink * $slot_person * <持って行って|届けて>
+bring_unknown_obj : $slot_any を $slot_person * <持って行って|届けて|取って>
 find : 人 * 探して
 
 

@@ -2,11 +2,12 @@
 from __future__ import unicode_literals
 import re
 import codecs
+from collections import OrderedDict
 
 class Grammar:
     def __init__(self):
         self.slot_finder = re.compile( "\$slot[A-z0-9-]*" )
-        self.grammars = {}
+        self.grammars = OrderedDict()
         self.slot2id = {}
 
     def normalize( self, s ):
@@ -37,7 +38,7 @@ class Grammar:
         lines = codecs.open( filename , "r" , "utf8" ).readlines()
         lines = [ l for l in lines ]
 
-        self.grammars = {}
+        self.grammars = OrderedDict()
         self.slot2id = {}
 
         slots = {}
@@ -92,33 +93,43 @@ class Grammar:
 
                     # slotを正規表現に変換
                     for class_id in self.slot_finder.findall(gram):
-                        gram = gram.replace( class_id, slot_re[class_id] )
+                        if class_id=="$slot_any":
+                            # 文字列を抽出する
+                            gram = gram.replace( class_id, "(\S+?)" )
+                        else:
+                            gram = gram.replace( class_id, slot_re[class_id] )
 
                     # その他を正規表現に変換
                     gram = gram.replace("<" , "(?:")
                     gram = gram.replace(">" , ")")
                     gram = gram.replace("*" , ".*?")
-                    gram = gram.replace( " " , "\s*?" )
-                    gram = ".*?" + gram + ".*?"
-                    gram = gram.lower()
+                    #gram = gram.replace( " " , "\s*?" )
+                    # gram = ".*?" + gram + ".*?"
+                    gram = gram.replace( " " , "" )
+                    #gram = gram.lower()
 
                     self.grammars[id] = re.compile(gram)
                     print( "RegEx:",id,"->",gram )
 
-    def match(self, s ):
-        s = s.lower()
+    def match(self, sentences ):
         matched_gramid = ""
         matched_slot = []
         mathced_slotid = []
         for id, g in self.grammars.items():
-            m = g.match(s)
+            for s in sentences:
+                s = s.lower()
+                m = g.match(s)
 
-            if m:
-                matched_gramid = id
-                matched_slot = m.groups()
-                for n in matched_slot:
-                    mathced_slotid.append( self.slot2id[n] )
-                return matched_gramid, matched_slot, mathced_slotid
+                if m:
+                    matched_gramid = id
+                    matched_slot = m.groups()
+                    for n in matched_slot:
+                        if n in self.slot2id:
+                            mathced_slotid.append( self.slot2id[n] )
+                        else:
+                            mathced_slotid.append( "any" )
+
+                    return s, matched_gramid, matched_slot, mathced_slotid
 
         return None
 
@@ -127,7 +138,7 @@ def main():
     g = Grammar()
 
     g.load( "grammar_sample.txt" )
-    print( g.match( "コーヒーを中村に持って行って" ) )
+    print( g.match( ["ラーメンを中村に持って行って", "コーヒーを中村に持って行って"] ) )
     print( g.match( "人を探して" ) )
     print( g.match( "こんにちは" ) )
     return
