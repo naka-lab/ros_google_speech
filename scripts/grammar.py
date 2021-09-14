@@ -106,6 +106,7 @@ class Grammar:
                     #gram = gram.replace( " " , "\s*?" )
                     # gram = ".*?" + gram + ".*?"
                     gram = gram.replace( " " , "" )
+                    gram = gram.replace( "　" , "" )
                     #gram = gram.lower()
 
                     self.grammars[id] = re.compile(gram)
