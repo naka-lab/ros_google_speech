@@ -67,6 +67,6 @@ if __name__=="__main__":
     pub_recres = rospy.Publisher('google_speech/recres', String, queue_size=10)
     pub_recres_nbest = rospy.Publisher('google_speech/recres_nbest', String, queue_size=10)
 
-    server = WebsocketServer(60000, host="127.0.0.1")
+    server = WebsocketServer(port=60000, host="127.0.0.1")
 
     main()
