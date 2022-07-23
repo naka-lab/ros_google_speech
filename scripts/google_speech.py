@@ -7,7 +7,10 @@ import threading
 
 def message_received(client, server, message):
     # 日本語の文字コードがおかしいので修正
-    message = bytes(message, "iso-8859-1").decode("utf8")
+    try:
+        message = bytes(message, "iso-8859-1").decode("utf8")
+    except UnicodeEncodeError:
+        message = bytes(message, "utf8").decode("utf8")
 
     print("認識結果：")
     results = []
