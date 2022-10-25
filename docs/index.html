@@ -112,11 +112,17 @@
 
             start_sr()
         }
+        function start_synthesis(){
+            // 一度ボタンから発話させないと動作しないため，発話させる
+            document.getElementById('utterance').value = "音声合成を開始しました";
+            say()
+        }
     </script> 
 </head>
  
 <body>
     <input type="button" onClick="start_all();" value="音認認識・合成開始">
+    <input type="button" onClick="start_synthesis();" value="音認合成のみ開始">
     <br>
     <br>
     認識結果：<br>
