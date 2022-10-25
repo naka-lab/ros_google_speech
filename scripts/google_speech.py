@@ -7,7 +7,10 @@ import threading
 
 def message_received(client, server, message):
     # 日本語の文字コードがおかしいので修正
-    message = bytes(message, "iso-8859-1").decode("utf8")
+    try:
+        message = bytes(message, "iso-8859-1").decode("utf8")
+    except UnicodeEncodeError:
+        message = bytes(message, "utf8").decode("utf8")
 
     print("認識結果：")
     results = []
@@ -67,6 +70,6 @@ if __name__=="__main__":
     pub_recres = rospy.Publisher('google_speech/recres', String, queue_size=10)
     pub_recres_nbest = rospy.Publisher('google_speech/recres_nbest', String, queue_size=10)
 
-    server = WebsocketServer(60000, host="127.0.0.1")
+    server = WebsocketServer(port=60000, host="127.0.0.1")
 
     main()

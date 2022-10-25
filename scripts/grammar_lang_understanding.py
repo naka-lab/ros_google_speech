@@ -17,6 +17,9 @@ class GrammarBasedLU():
     def __init__(self):
         rospy.init_node("grammar_lu")
 
+        with open( "prohibited_words.txt", "r" ) as f:
+            self.probibited_words = [ line.strip() for line in f.readlines()]
+
         self.pub_results = rospy.Publisher('grammar_lu/results', String , queue_size=10)
         rospy.Subscriber("google_speech/recres_nbest", String, self.recog_callback)
         rospy.Subscriber("grammar_lu/grammar", String, self.set_gram)
@@ -31,6 +34,14 @@ class GrammarBasedLU():
 
         sentences = [ r["text"] for r in results ]
 
+        # 禁止用語が含まれているものを除外する
+        for s in sentences:
+            for pw in self.probibited_words:
+                if pw in s:
+                    print( "禁止用語発見", s )
+                    os.system( "aplay beep_failed.wav" )
+                    return
+
         m = self.gram.match( sentences )
         if m:
             text, gram_id, slot_str, slot_id = m
@@ -43,9 +54,11 @@ class GrammarBasedLU():
             print(yaml.dump(lu_res))
             self.pub_results.publish( yaml.dump(lu_res) )
             print( "---------------------------" )
+            os.system( "aplay beep_success.wav" )
             return
         else:
             print( "文法マッチなし" )
+            os.system( "aplay beep_failed.wav" )
 
     def set_gram( self, data ):
         print( "--- set grammar ---" )

@@ -40,7 +40,8 @@ git clone https://github.com/naka-lab/ros_google_speech.git
 ```
 [GRAMMAR]
 greeding : ロボット $slot_greeding
-bring : $slot_drink * $slot_person * <持って行って|届けて|取って>
+bring_known_obj : $slot_drink * $slot_person * <持って行って|届けて>
+bring_unknown_obj : $slot_any を $slot_person * <持って行って|届けて|取って>
 
 
 [SLOT]
@@ -62,7 +63,10 @@ person3 : 太郎
 `[GRAMMAR]`に音声認識文法を記述します．`greeding : ロボット $slot_greeding`の`greeding`は認識文のIDを，右側の文字列が認識される文章になります．
 `$slot_greeding`は単語が入るスロットを表しており，`[SLOT]`以下がスロットに入る単語を定義しています．
 `hello : こんにちは|ハロー`の`hello`が単語のIDを，`こんにちは|ハロー`が認識される文字列を表しています．
-`|`はorを表しており，`こんにちは`または`ハロー`が認識されます．文法では`<a|b|c>`という書式でorを記述できます．
-`*`はいずれの文字列にもマッチします．
 
-`|`や`*`を使うことでユーザ発話のゆらぎを吸収して，発話内容を認識できます．
+`|`はorを表しており，`こんにちは`または`ハロー`が認識されます．文法では`<a|b|c>`という書式でorを記述できます．
+`*`はいずれの文字列にもマッチします．`|`や`*`を使うことでユーザ発話のゆらぎを吸収して，発話内容を認識できます．
+
+`$slot_any`は任意の文字列をスロットとして抽出します．上記の文法の場合，上に記述されている文法が優先されます．
+すなわち，`bring_known_obj`の文法と文字列がマッチしなかった場合，次の行の`bring_unknown_obj`との照合が行われます．
+こうすることで，ロボットが知っているものを指示された場合（`bring_known_obj`）と，知らないものを指示された場合（`bring_unknown_obj`）を区別できます．
