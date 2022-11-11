@@ -7,6 +7,7 @@ import rospy
 from std_msgs.msg import String
 import grammar
 import os
+import codecs
 
 os.chdir( os.path.dirname(__file__) )
 
@@ -17,7 +18,7 @@ class GrammarBasedLU():
     def __init__(self):
         rospy.init_node("grammar_lu")
 
-        with open( "prohibited_words.txt", "r" ) as f:
+        with codecs.open( "prohibited_words.txt", "r", "utf8" ) as f:
             self.probibited_words = [ line.strip() for line in f.readlines()]
 
         self.pub_results = rospy.Publisher('grammar_lu/results', String , queue_size=10)
