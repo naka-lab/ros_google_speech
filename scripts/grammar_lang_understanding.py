@@ -9,10 +9,20 @@ import grammar
 import os
 import codecs
 
+# windowsの場合
+if os.name=="nt":
+    import winsound
+
 os.chdir( os.path.dirname(__file__) )
 
 
 def to_slist( list_ ): return [ str(l) for l in list_ ]
+
+def play_sound( filename ):
+    if os.name!="nt":
+        os.system( "aplay " + filename )
+    else:
+        winsound.PlaySound( filename, winsound.SND_FILENAME )
 
 class GrammarBasedLU():
     def __init__(self):
@@ -40,7 +50,7 @@ class GrammarBasedLU():
             for pw in self.probibited_words:
                 if pw in s:
                     print( "禁止用語発見", s )
-                    os.system( "aplay beep_failed.wav" )
+                    play_sound( "beep_failed.wav" )
                     return
 
         m = self.gram.match( sentences )
@@ -55,11 +65,11 @@ class GrammarBasedLU():
             print(yaml.dump(lu_res))
             self.pub_results.publish( yaml.dump(lu_res) )
             print( "---------------------------" )
-            os.system( "aplay beep_success.wav" )
+            play_sound( "beep_success.wav" )
             return
         else:
             print( "文法マッチなし" )
-            os.system( "aplay beep_failed.wav" )
+            play_sound( "beep_failed.wav" )
 
     def set_gram( self, data ):
         print( "--- set grammar ---" )
