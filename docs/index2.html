@@ -9,6 +9,26 @@
         var flag_speech = 0;
         var wSck= null;
         var is_connected = false
+
+
+        // 音声の追加
+        var voices = null;
+        window.speechSynthesis.onvoiceschanged = function(){
+            voices = speechSynthesis.getVoices();
+            var select = document.getElementById("voice_select");
+            for (var i = 0; i < voices.length; i++) {
+                console.log(voices[i].name);
+                var option = document.createElement("option");
+                option.text = voices[i].name;
+                option.value = i;
+                select.appendChild(option);
+
+                if( voices[i].name.indexOf("日本語",0)!=-1 ){
+                    select.value = i;
+                };
+            };
+        };
+        
         connect_websock()
 
         // websocketへの接続
@@ -96,7 +116,11 @@
         function say() {
             var line = document.getElementById('utterance');
             const uttr = new SpeechSynthesisUtterance(line.value)
+            var select = document.getElementById("voice_select");
+            var idx = select.value;
+            console.log(idx);
 
+            uttr.voice = voices[idx];
             uttr.lang = "ja-JP"
             uttr.rate = 1.0
             uttr.pitch = 1.0
@@ -141,9 +165,10 @@
     <br>
     <br>
     発話：<br>
+    <select name="voice" id="voice_select">
+    </select><br>
     <textarea id="utterance" cols="50" rows="1"></textarea>
     <input type="button" onClick="say();" value="発話">
 
 </body>
- 
 </html>
