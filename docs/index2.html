@@ -9,8 +9,6 @@
         var flag_speech = 0;
         var wSck= null;
         var is_connected = false
-        var recognition = null;
-
         connect_websock()
 
         // websocketへの接続
@@ -44,8 +42,8 @@
         };
 
         function start_sr() {
-            recognition = new webkitSpeechRecognition();
             window.SpeechRecognition = window.SpeechRecognition || webkitSpeechRecognition;
+            var recognition = new webkitSpeechRecognition();
             recognition.lang = 'ja';
             recognition.interimResults = true;
             recognition.continuous = true;
@@ -95,7 +93,7 @@
         }
 
         // 発話関数
-        async function say() {
+        function say() {
             var line = document.getElementById('utterance');
             const uttr = new SpeechSynthesisUtterance(line.value)
 
@@ -104,31 +102,15 @@
             uttr.pitch = 1.0
             uttr.volume = 1.0
 
-            console.log("aaaa")
-
-            
-            if( recognition!=null ){
-                console.log("stop");
-                recognition.onend = function ( event ){
-                    console.log("onend");
-                };
-                recognition.stop();
-                uttr.onend = function(event) {
-                    console.log("restart");
-                    recognition.start();
-                };
-            };
-
-            await sleep(500);
-            console.log("speak")
-            speechSynthesis.speak(uttr);
+            speechSynthesis.speak(uttr)
         }
 
         function start_all(){
             // 一度ボタンから発話させないと動作しないため，発話させる
             document.getElementById('utterance').value = "音声認識を開始しました";
-            start_sr()
             say()
+
+            start_sr()
         }
         function start_synthesis(){
             // 一度ボタンから発話させないと動作しないため，発話させる
